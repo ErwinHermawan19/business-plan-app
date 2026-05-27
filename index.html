@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Business Plan App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="bg-white rounded-3xl shadow-2xl p-8 mb-6">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div>
+          <h1 class="text-5xl font-bold text-gray-900 mb-2">Business Plan Builder</h1>
+          <p class="text-gray-500 text-lg">Aplikasi business plan siap pakai langsung di browser.</p>
+        </div>
+
+        <div class="flex gap-3 flex-wrap">
+          <button onclick="saveDraft()" class="bg-black text-white px-6 py-3 rounded-2xl hover:opacity-90">
+            Simpan Draft
+          </button>
+
+          <button onclick="exportPDF()" class="border border-black px-6 py-3 rounded-2xl hover:bg-black hover:text-white transition">
+            Export PDF
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
+      <div class="bg-white rounded-3xl p-6 shadow-lg">
+        <p class="text-gray-500 mb-2">Modal Awal</p>
+        <h2 id="modalView" class="text-3xl font-bold">Rp 0</h2>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 shadow-lg">
+        <p class="text-gray-500 mb-2">Target Omzet</p>
+        <h2 id="omzetView" class="text-3xl font-bold">Rp 0</h2>
+      </div>
+
+      <div class="bg-white rounded-3xl p-6 shadow-lg">
+        <p class="text-gray-500 mb-2">Biaya Operasional</p>
+        <h2 id="biayaView" class="text-3xl font-bold">Rp 0</h2>
+      </div>
+
+      <div class="bg-black text-white rounded-3xl p-6 shadow-lg">
+        <p class="text-gray-300 mb-2">Estimasi Profit</p>
+        <h2 id="profitView" class="text-3xl font-bold">Rp 0</h2>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white rounded-3xl p-8 shadow-xl space-y-5">
+        <h2 class="text-3xl font-bold mb-4">Profil Bisnis</h2>
+
+        <input id="businessName" type="text" placeholder="Nama Bisnis"
+          class="w-full border rounded-2xl p-4" />
+
+        <input id="owner" type="text" placeholder="Owner / Founder"
+          class="w-full border rounded-2xl p-4" />
+
+        <input id="industry" type="text" placeholder="Industri"
+          class="w-full border rounded-2xl p-4" />
+
+        <input id="location" type="text" placeholder="Lokasi"
+          class="w-full border rounded-2xl p-4" />
+      </div>
+
+      <div class="bg-white rounded-3xl p-8 shadow-xl space-y-5">
+        <h2 class="text-3xl font-bold mb-4">Keuangan</h2>
+
+        <input id="startupCapital" type="number" placeholder="Modal Awal"
+          class="w-full border rounded-2xl p-4" oninput="calculateProfit()" />
+
+        <input id="monthlyRevenue" type="number" placeholder="Target Omzet Bulanan"
+          class="w-full border rounded-2xl p-4" oninput="calculateProfit()" />
+
+        <input id="monthlyExpense" type="number" placeholder="Biaya Operasional Bulanan"
+          class="w-full border rounded-2xl p-4" oninput="calculateProfit()" />
+
+        <input id="fundingNeeded" type="number" placeholder="Pendanaan Dibutuhkan"
+          class="w-full border rounded-2xl p-4" />
+      </div>
+    </div>
+
+    <div class="bg-white rounded-3xl p-8 shadow-2xl mt-6 mb-6">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-4xl font-bold">Live Business Plan Preview</h2>
+          <p class="text-gray-500 mt-2">Preview otomatis berubah secara realtime.</p>
+        </div>
+
+        <div class="bg-black text-white px-5 py-3 rounded-2xl text-lg font-semibold">
+          Interactive Output
+        </div>
+      </div>
+
+      <div id="previewOutput" class="bg-gray-100 rounded-3xl p-8 space-y-6 min-h-[1200px]">
+        <div>
+          <h1 id="previewBusinessName" class="text-4xl font-bold text-gray-900">
+            Nama Bisnis
+          </h1>
+          <p id="previewIndustry" class="text-gray-500 text-lg mt-2">
+            Industri
+          </p>
+
+          <div class="flex flex-wrap gap-3 mt-4">
+            <div class="bg-white px-4 py-2 rounded-2xl shadow text-sm">
+              <span class="font-semibold">Owner:</span>
+              <span id="previewOwner">-</span>
+            </div>
+
+            <div class="bg-white px-4 py-2 rounded-2xl shadow text-sm">
+              <span class="font-semibold">Lokasi:</span>
+              <span id="previewLocation">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="bg-white rounded-2xl p-5 shadow">
+            <p class="text-gray-500 mb-2">Modal Awal</p>
+            <h2 id="previewModal" class="text-2xl font-bold">Rp 0</h2>
+          </div>
+
+          <div class="bg-white rounded-2xl p-5 shadow">
+            <p class="text-gray-500 mb-2">Target Omzet</p>
+            <h2 id="previewOmzet" class="text-2xl font-bold">Rp 0</h2>
+          </div>
+
+          <div class="bg-black text-white rounded-2xl p-5 shadow">
+            <p class="text-gray-300 mb-2">Estimasi Profit</p>
+            <h2 id="previewProfit" class="text-2xl font-bold">Rp 0</h2>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div class="bg-white rounded-2xl p-6 shadow">
+            <h3 class="text-2xl font-bold mb-4">Produk / Jasa</h3>
+            <p id="previewProduct" class="text-gray-700 whitespace-pre-line">-</p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-6 shadow">
+            <h3 class="text-2xl font-bold mb-4">Target Market</h3>
+            <p id="previewMarket" class="text-gray-700 whitespace-pre-line">-</p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-6 shadow">
+            <h3 class="text-2xl font-bold mb-4">Strategi Marketing</h3>
+            <p id="previewMarketing" class="text-gray-700 whitespace-pre-line">-</p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-6 shadow">
+            <h3 class="text-2xl font-bold mb-4">Operasional</h3>
+            <p id="previewOperational" class="text-gray-700 whitespace-pre-line">-</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 mt-6">
+      <div class="bg-white rounded-3xl p-8 shadow-xl">
+        <h2 class="text-3xl font-bold mb-4">Produk / Jasa</h2>
+
+        <textarea id="product" rows="6" placeholder="Jelaskan produk atau jasa"
+          class="w-full border rounded-2xl p-4"></textarea>
+      </div>
+
+      <div class="bg-white rounded-3xl p-8 shadow-xl">
+        <h2 class="text-3xl font-bold mb-4">Target Market</h2>
+
+        <textarea id="market" rows="6" placeholder="Target customer dan market"
+          class="w-full border rounded-2xl p-4"></textarea>
+      </div>
+
+      <div class="bg-white rounded-3xl p-8 shadow-xl">
+        <h2 class="text-3xl font-bold mb-4">Strategi Marketing</h2>
+
+        <textarea id="marketing" rows="6" placeholder="Strategi promosi dan marketing"
+          class="w-full border rounded-2xl p-4"></textarea>
+      </div>
+
+      <div class="bg-white rounded-3xl p-8 shadow-xl">
+        <h2 class="text-3xl font-bold mb-4">Operasional Bisnis</h2>
+
+        <textarea id="operational" rows="6" placeholder="Operasional bisnis"
+          class="w-full border rounded-2xl p-4"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script>
+    function rupiah(number) {
+      return 'Rp ' + Number(number || 0).toLocaleString('id-ID');
+    }
+
+    function updatePreview() {
+      const data = getData();
+
+      document.getElementById('previewBusinessName').innerText = data.businessName || 'Nama Bisnis';
+      document.getElementById('previewIndustry').innerText = data.industry || 'Industri';
+
+      document.getElementById('previewOwner').innerText = data.owner || '-';
+      document.getElementById('previewLocation').innerText = data.location || '-';
+
+      document.getElementById('previewModal').innerText = rupiah(data.startupCapital);
+      document.getElementById('previewOmzet').innerText = rupiah(data.monthlyRevenue);
+
+      const profit = Number(data.monthlyRevenue || 0) - Number(data.monthlyExpense || 0);
+
+      document.getElementById('previewProfit').innerText = rupiah(profit);
+
+      document.getElementById('previewProduct').innerText = data.product || '-';
+      document.getElementById('previewMarket').innerText = data.market || '-';
+      document.getElementById('previewMarketing').innerText = data.marketing || '-';
+      document.getElementById('previewOperational').innerText = data.operational || '-';
+    }
+
+    function calculateProfit() {
+      const modal = document.getElementById('startupCapital').value;
+      const omzet = document.getElementById('monthlyRevenue').value;
+      const biaya = document.getElementById('monthlyExpense').value;
+
+      const profit = Number(omzet || 0) - Number(biaya || 0);
+
+      document.getElementById('modalView').innerText = rupiah(modal);
+      document.getElementById('omzetView').innerText = rupiah(omzet);
+      document.getElementById('biayaView').innerText = rupiah(biaya);
+      document.getElementById('profitView').innerText = rupiah(profit);
+
+      updatePreview();
+    }
+
+    function getData() {
+      return {
+        businessName: document.getElementById('businessName').value,
+        owner: document.getElementById('owner').value,
+        industry: document.getElementById('industry').value,
+        location: document.getElementById('location').value,
+        startupCapital: document.getElementById('startupCapital').value,
+        monthlyRevenue: document.getElementById('monthlyRevenue').value,
+        monthlyExpense: document.getElementById('monthlyExpense').value,
+        fundingNeeded: document.getElementById('fundingNeeded').value,
+        product: document.getElementById('product').value,
+        market: document.getElementById('market').value,
+        marketing: document.getElementById('marketing').value,
+        operational: document.getElementById('operational').value,
+      };
+    }
+
+    function saveDraft() {
+      localStorage.setItem('business-plan-app', JSON.stringify(getData()));
+      alert('Business plan berhasil disimpan');
+    }
+
+    async function exportPDF() {
+      const { jsPDF } = window.jspdf;
+
+      const preview = document.getElementById('previewOutput');
+
+      preview.style.background = '#f3f4f6';
+
+      const canvas = await html2canvas(preview, {
+        scale: 4,
+        useCORS: true,
+        backgroundColor: '#f3f4f6',
+        scrollY: -window.scrollY,
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      pdf.setFillColor(243, 244, 246);
+      pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
+
+      const imgWidth = pdfWidth - 20;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = 10;
+
+      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight, undefined, 'FAST');
+      heightLeft -= pdfHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight + 10;
+
+        pdf.addPage();
+        pdf.setFillColor(243, 244, 246);
+        pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+
+        heightLeft -= pdfHeight;
+      }
+
+      const businessName = document.getElementById('businessName').value || 'business-plan';
+
+      pdf.save(`${businessName}.pdf`);
+    }
+
+    function loadDraft() {
+      const saved = JSON.parse(localStorage.getItem('business-plan-app'));
+
+      if (!saved) return;
+
+      Object.keys(saved).forEach((key) => {
+        const element = document.getElementById(key);
+
+        if (element) {
+          element.value = saved[key];
+        }
+      });
+
+      calculateProfit();
+    }
+
+    document.querySelectorAll('input, textarea').forEach((element) => {
+      element.addEventListener('input', () => {
+        updatePreview();
+      });
+    });
+
+    loadDraft();
+    updatePreview();
+  </script>
+</body>
+</html>
